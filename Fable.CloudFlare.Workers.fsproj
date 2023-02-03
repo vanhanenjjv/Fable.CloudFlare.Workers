@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Headers.fs" />
+    <Compile Include="ExecutionContext.fs" />
+    <Compile Include="Request.fs" />
+    <Compile Include="Response.fs" />
+    <Compile Include="KVNamespace.fs" />
+    <Compile Include="Queue.fs" />
+    <Compile Include="Scheduled.fs" />
+    <Compile Include="Handler.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Fable.Browser.Blob" Version="1.2.0" />
+    <PackageReference Include="Fable.Core" Version="3.7.1" />
+  </ItemGroup>
+
+</Project>
