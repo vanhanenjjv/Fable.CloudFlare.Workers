@@ -32,5 +32,4 @@ type KVNamespace =
     member _.put(key: string, value: string) : JS.Promise<unit> = jsNative
     member _.put(key: string, value: JS.ArrayBuffer) : JS.Promise<unit> = jsNative
     member _.put(key: string, value: JS.ArrayBufferView) : JS.Promise<unit> = jsNative
-    member _.getWithMetadata(key: string): KVNamespace.GetWithMetadataResult<string, obj> = jsNative
     member _.getWithMetadata<'metadata>(key: string): KVNamespace.GetWithMetadataResult<string, 'metadata> = jsNative
