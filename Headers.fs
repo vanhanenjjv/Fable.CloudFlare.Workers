@@ -2,19 +2,28 @@ namespace Fable.CloudFlare.Workers
 
 open Fable.Core
 
-[<Global "Headers">]
-type Headers() =
-    new(headers: Headers) = Headers()
-    new(headers: (string * string) seq) = Headers()
+type Headers =
+    abstract get: string -> string seq
+    abstract getAll: string -> string seq
+    abstract has: string -> bool
+    [<Emit "$0($1, $2)">]
+    abstract set: string -> string -> unit
+    [<Emit "$0($1, $2)">]
+    abstract append: string -> string -> unit
+    abstract delete: string -> unit
+    abstract forEach: (JS.Object -> string -> string -> Headers) -> unit
+    abstract forEach: ('this -> string -> string -> Headers -> unit) -> 'this
+    abstract values: unit -> string seq
+    abstract entries: unit -> (string * string) seq
+    abstract keys: unit -> string seq
 
-    member _.get(name: string) : string option = jsNative
-    member _.getAll(name: string) : string seq = jsNative
-    member _.has(name: string) : bool = jsNative
-    member _.set(name: string, value: string) : unit = jsNative
-    member _.append(name: string, value: string) : unit = jsNative
-    member _.delete(name: string) : unit = jsNative
-    member _.forEach(callback: (JS.Object * string * string * Headers) -> unit) = jsNative
-    member _.forEach(callback: ('this * string * string * Headers) -> unit, thisArg: 'this) = jsNative
-    member _.values() : string seq = jsNative
-    member _.entries() : (string * string) seq = jsNative
-    member _.keys() : string seq = jsNative
+type HeadersStatic =
+    [<Emit "new $0()">]
+    abstract make : unit -> Headers
+    [<Emit "new $0($1)">]
+    abstract make : (string * string) seq -> Headers
+
+[<AutoOpen>]
+module Globals =
+    [<Global>]
+    let Headers: HeadersStatic = jsNative

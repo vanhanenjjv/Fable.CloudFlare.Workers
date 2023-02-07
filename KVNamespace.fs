@@ -3,33 +3,31 @@ namespace Fable.CloudFlare.Workers
 open Fable.Core
 
 module KVNamespace =
-    [<AllowNullLiteral>]
-    type ListOptions() =
-        [<DefaultValue>]
-        val mutable limit: int
-        [<DefaultValue>]
-        val mutable prefix: string
-        [<DefaultValue>]
-        val mutable cursor: string
+    type ListOptions =
+        { limit: int option
+          prefix: string option
+          cursor: string option }
 
-    [<AllowNullLiteral>]
-    type GetWithMetadataResult<'value, 'metadata>() =
-        [<DefaultValue>]
-        val mutable value: 'value
-        [<DefaultValue>]
-        val mutable metadata: 'metadata
+    module ListOptions =
+        let make () =
+            { limit = None
+              prefix = None
+              cursor = None }
 
-[<Global>]
+    type GetWithMetadataResult<'value, 'metadata> =
+        { value: 'value
+          metadata: 'metadata }
+
 type KVNamespace =
     [<Emit "$0.get($1)">]
-    member _.get<'a>(key: string) : JS.Promise<string option> = jsNative
+    abstract get : string -> JS.Promise<string option>
     [<Emit "$0.get($1, 'json')">]
-    member _.getJson<'a>(key: string) : JS.Promise<'a option> = jsNative
+    abstract getJSON<'a> : string -> JS.Promise<'a option>
     [<Emit "$0.get($1, 'arrayBuffer')">]
-    member _.getArrayBuffer<'a>(key: string) : JS.Promise<JS.ArrayBuffer option> = jsNative
-    member _.list() : JS.Promise<unit> = jsNative
-    member _.list(options: KVNamespace.ListOptions) : JS.Promise<unit> = jsNative
-    member _.put(key: string, value: string) : JS.Promise<unit> = jsNative
-    member _.put(key: string, value: JS.ArrayBuffer) : JS.Promise<unit> = jsNative
-    member _.put(key: string, value: JS.ArrayBufferView) : JS.Promise<unit> = jsNative
-    member _.getWithMetadata<'metadata>(key: string): KVNamespace.GetWithMetadataResult<string, 'metadata> = jsNative
+    abstract getArrayBuffer : string -> JS.Promise<JS.ArrayBuffer option>
+    abstract list : unit -> JS.Promise<unit>
+    abstract list : KVNamespace.ListOptions -> JS.Promise<unit>
+    abstract put : string * string -> JS.Promise<unit>
+    abstract put : string * JS.ArrayBuffer -> JS.Promise<unit>
+    abstract put : string * JS.ArrayBufferView -> JS.Promise<unit>
+    abstract getWithMetadata<'metadata> : string -> KVNamespace.GetWithMetadataResult<string, 'metadata>

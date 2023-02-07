@@ -3,26 +3,31 @@ namespace Fable.CloudFlare.Workers
 open Fable.Core
 
 module Request =
-    [<AllowNullLiteral>]
-    type Options() =
-        [<DefaultValue>]
-        val mutable method: string
+    type Options =
+        { method: string option
+          url: string option
+          headers: Headers option }
 
-        [<DefaultValue>]
-        val mutable url: string
+    module Options =
+        let make () =
+            { method = None
+              url = None
+              headers = None }
 
-        [<DefaultValue>]
-        val mutable headers: Headers
+type Request =
+    abstract method : string
+    abstract url : string
+    abstract headers : Headers
+    abstract json<'a> : unit -> JS.Promise<'a>
+    abstract text : unit -> JS.Promise<string>
 
-[<Global>]
-[<AllowNullLiteral>]
-type Request() =
-    new(request: Request) = Request()
-    new(request: Request, options: Request.Options) = Request()
+type RequestStatic =
+    [<Emit "new $0($1)">]
+    abstract make : Request -> Request
+    [<Emit "new $0($1, $2)">]
+    abstract make : Request * Request.Options -> Request
 
-    member _.method: string = jsNative
-    member _.url: string = jsNative
-    member _.headers: Headers = jsNative
-
-    member _.json<'a>() : JS.Promise<'a> = jsNative
-    member _.text() : JS.Promise<string> = jsNative
+[<AutoOpen>]
+module Globals =
+    [<Global>]
+    let Request: RequestStatic = jsNative

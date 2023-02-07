@@ -4,25 +4,32 @@ open Fable.Core
 open Browser.Types
 
 module Response =
-    [<AllowNullLiteral>]
-    type Options() =
-        [<DefaultValue>]
-        val mutable status: int
+    type Options =
+        { status: int option
+          statusText: string option
+          headers: Headers option }
 
-        [<DefaultValue>]
-        val mutable statusText: string
+type Response = interface end
 
-        [<DefaultValue>]
-        val mutable headers: Headers
+type ResponseStatic =
+    [<Emit "new $0($1)">]
+    abstract make : string -> Response
+    [<Emit "new $0($1)">]
+    abstract make : Blob -> Response
+    [<Emit "new $0($1)">]
+    abstract make : JS.ArrayBuffer -> Response
+    [<Emit "new $0($1, $2)">]
+    abstract make : string * Response.Options -> Response
+    [<Emit "new $0($1, $2)">]
+    abstract make : Blob * Response.Options -> Response
+    [<Emit "new $0($1, $2)">]
+    abstract make : JS.ArrayBuffer * Response.Options -> Response
+    [<Emit "new $0($1, $2)">]
+    
+    abstract member redirect: string -> Response
+    abstract member redirect: string * int -> Response
 
-[<Global>]
-type Response() =
-    new(body: string) = Response()
-    new(body: Blob) = Response()
-    new(body: JS.ArrayBuffer) = Response()
-    new(body: string, options: Response.Options) = Response() 
-    new(body: Blob, options: Response.Options) = Response()
-    new(body: JS.ArrayBuffer, options: Response.Options) = Response()
-
-    static member redirect(url: string) : Response = jsNative
-    static member redirect(url: string, status: int) : Response = jsNative
+[<AutoOpen>]
+module Globals =
+    [<Global>]
+    let Response: ResponseStatic = jsNative
